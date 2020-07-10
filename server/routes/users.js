@@ -5,7 +5,12 @@ const User = require("../models/user");
 const { response } = require("express");
 const app = express();
 
-app.get("/usuario", function (req, res) {
+const {
+  verificaToken,
+  verificaAdmin_Role,
+} = require("../middlewares/autenticacion");
+
+app.get("/usuario", verificaToken, (req, res) => {
   let page = req.query.page - 1 || 0;
   page = Number(page);
 
@@ -33,7 +38,7 @@ app.get("/usuario", function (req, res) {
     });
 });
 
-app.post("/usuario", function (req, res) {
+app.post("/usuario", [verificaToken, verificaAdmin_Role], (req, res) => {
   let body = req.body;
 
   let usuario = new User({
@@ -58,7 +63,7 @@ app.post("/usuario", function (req, res) {
   });
 });
 
-app.put("/usuario/:id", function (req, res) {
+app.put("/usuario/:id", [verificaToken, verificaAdmin_Role], (req, res) => {
   let id = req.params.id;
   let body = _.pick(req.body, ["nombre", "email", "img", "role", "estado"]);
 
@@ -82,7 +87,7 @@ app.put("/usuario/:id", function (req, res) {
   );
 });
 
-app.delete("/usuario/:id", function (req, res) {
+app.delete("/usuario/:id", [verificaToken, verificaAdmin_Role], (req, res) => {
   let id = req.params.id;
 
   //Borrado fisico
